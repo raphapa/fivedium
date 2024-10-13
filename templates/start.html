@@ -1,0 +1,362 @@
+<html><head><base href="https://www.fivedium.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fivedium - Services créatifs pixelisés</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', monospace;
+    background-color: #f7e9de;
+    color: #73483f;
+  }
+  .header {
+    background-color: #d95e40;
+    color: #f7e9de;
+    padding: 1rem;
+    text-align: center;
+    image-rendering: pixelated;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .search-bar input {
+    width: 70%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #d95e40;
+    background-color: #f7e9de;
+    color: #73483f;
+  }
+  .categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  .category {
+    background-color: #f7e9de;
+    border: 2px solid #d95e40;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+    image-rendering: pixelated;
+    cursor: pointer;
+  }
+  .category:hover {
+    transform: scale(1.05);
+    background-color: #d95e40;
+    color: #f7e9de;
+  }
+  .category img, .category svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.5rem;
+  }
+  .pixel-art {
+    image-rendering: pixelated;
+  }
+  .hidden {
+    display: none;
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+  }
+  .modal-content {
+    background-color: #f7e9de;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #d95e40;
+    width: 80%;
+    max-width: 500px;
+  }
+  .close {
+    color: #d95e40;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .close:hover {
+    color: #73483f;
+  }
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .form-group input, .form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d95e40;
+    background-color: #f7e9de;
+    color: #73483f;
+  }
+  .btn {
+    background-color: #d95e40;
+    color: #f7e9de;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+  }
+  .btn:hover {
+    background-color: #73483f;
+  }
+  .add-service-btn {
+    display: block;
+    margin: 2rem auto;
+    font-size: 1.2rem;
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>Fivedium</h1>
+    <p>Services créatifs pixelisés à partir de 5 crédits</p>
+  </header>
+
+  <div class="container">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Recherchez un service...">
+    </div>
+
+    <div class="categories" id="categories-container">
+      <!-- Les catégories existantes seront chargées dynamiquement ici -->
+    </div>
+
+    <button id="add-service-btn" class="btn add-service-btn">Ajouter un nouveau service</button>
+  </div>
+
+  <div id="add-service-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Ajouter un nouveau service</h2>
+      <form id="add-service-form">
+        <div class="form-group">
+          <label for="service-name">Nom du service :</label>
+          <input type="text" id="service-name" required>
+        </div>
+        <div class="form-group">
+          <label for="service-description">Description :</label>
+          <textarea id="service-description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="service-price">Prix (en crédits) :</label>
+          <input type="number" id="service-price" min="5" required>
+        </div>
+        <button type="submit" class="btn">Créer le service</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search-input');
+    const categoriesContainer = document.getElementById('categories-container');
+    const addServiceBtn = document.getElementById('add-service-btn');
+    const modal = document.getElementById('add-service-modal');
+    const closeBtn = modal.querySelector('.close');
+    const addServiceForm = document.getElementById('add-service-form');
+
+    // Fonction pour charger les services depuis le stockage local
+    function loadServices() {
+      const services = JSON.parse(localStorage.getItem('services')) || [];
+      return services;
+    }
+
+    // Fonction pour sauvegarder les services dans le stockage local
+    function saveServices(services) {
+      localStorage.setItem('services', JSON.stringify(services));
+    }
+
+    // Fonction pour créer un élément de catégorie
+    function createCategoryElement(service) {
+      const category = document.createElement('div');
+      category.className = 'category';
+      category.dataset.name = service.name;
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute('class', 'pixel-art');
+      svg.setAttribute('width', '64');
+      svg.setAttribute('height', '64');
+      svg.setAttribute('viewBox', '0 0 16 16');
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute('fill', '#d95e40');
+      path.setAttribute('d', 'M2 2h12v12H2z');
+      svg.appendChild(path);
+
+      const title = document.createElement('h3');
+      title.textContent = service.name;
+
+      category.appendChild(svg);
+      category.appendChild(title);
+
+      category.addEventListener('click', function() {
+        alert(`Service : ${service.name}\nDescription : ${service.description}\nPrix : ${service.price} crédits`);
+      });
+
+      return category;
+    }
+
+    // Fonction pour afficher tous les services
+    function displayServices() {
+      const services = loadServices();
+      categoriesContainer.innerHTML = ''; // Nettoyer le conteneur
+
+      // Ajouter les catégories par défaut
+      const defaultCategories = [
+        { name: 'Pixel Art', icon: '/a/e90f4b90-b130-4e8c-8459-97d5b6871185' },
+        { name: 'Rédaction 8-bit', icon: 'M4 1h8v2H4zM3 4h10v2H3zM2 7h12v2H2zM3 10h10v2H3zM4 13h8v2H4z' },
+        { name: 'Vidéo Rétro', icon: 'M2 2h12v12H2z M4 4v8l8-4z' },
+        { name: 'Chiptune', icon: 'M4 4h2v8H4zM8 2h2v12H8zM12 6h2v4h-2z' },
+        { name: 'Code ASCII', icon: 'M2 2h12v2H2zM2 6h12v2H2zM2 10h12v2H2zM6 14h4v2H6z' },
+        { name: 'Stratégie 16-bit', icon: 'M2 2h12v12H2zM4 4h8v8H4zM6 6h4v4H6z' }
+      ];
+
+      defaultCategories.forEach(cat => {
+        const category = document.createElement('div');
+        category.className = 'category';
+        category.dataset.name = cat.name;
+
+        if (cat.name === 'Pixel Art') {
+          const img = document.createElement('img');
+          img.src = cat.icon;
+          img.alt = "Icône de bacon pixelisé";
+          img.className = 'pixel-art';
+          category.appendChild(img);
+        } else {
+          const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          svg.setAttribute('class', 'pixel-art');
+          svg.setAttribute('width', '64');
+          svg.setAttribute('height', '64');
+          svg.setAttribute('viewBox', '0 0 16 16');
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute('fill', '#d95e40');
+          path.setAttribute('d', cat.icon);
+          svg.appendChild(path);
+          category.appendChild(svg);
+        }
+
+        const title = document.createElement('h3');
+        title.textContent = cat.name;
+        category.appendChild(title);
+
+        category.addEventListener('click', function() {
+          alert(`Vous avez sélectionné la catégorie : ${cat.name}`);
+        });
+
+        categoriesContainer.appendChild(category);
+      });
+
+      // Ajouter les services créés par les utilisateurs
+      services.forEach(service => {
+        const categoryElement = createCategoryElement(service);
+        categoriesContainer.appendChild(categoryElement);
+      });
+    }
+
+    // Fonction de recherche
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const categories = categoriesContainer.querySelectorAll('.category');
+      categories.forEach(category => {
+        const categoryName = category.dataset.name.toLowerCase();
+        if (categoryName.includes(searchTerm)) {
+          category.classList.remove('hidden');
+        } else {
+          category.classList.add('hidden');
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', performSearch);
+
+    addServiceBtn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    addServiceForm.onsubmit = function(e) {
+      e.preventDefault();
+      const serviceName = document.getElementById('service-name').value;
+      const serviceDescription = document.getElementById('service-description').value;
+      const servicePrice = document.getElementById('service-price').value;
+
+      const newService = {
+        name: serviceName,
+        description: serviceDescription,
+        price: servicePrice
+      };
+
+      const services = loadServices();
+      services.push(newService);
+      saveServices(services);
+
+      displayServices(); // Rafraîchir l'affichage
+
+      addServiceForm.reset();
+      modal.style.display = "none";
+
+      // Mise à jour de l'URL pour inclure le nouveau service
+      updateURL(newService);
+    }
+
+    // Fonction pour mettre à jour l'URL avec les paramètres du nouveau service
+    function updateURL(service) {
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.append('service', JSON.stringify(service));
+      const newURL = `${window.location.pathname}?${searchParams.toString()}`;
+      history.pushState(null, '', newURL);
+    }
+
+    // Fonction pour charger les services depuis l'URL
+    function loadServicesFromURL() {
+      const searchParams = new URLSearchParams(window.location.search);
+      const servicesFromURL = searchParams.getAll('service').map(s => JSON.parse(s));
+      const existingServices = loadServices();
+      const newServices = servicesFromURL.filter(s => !existingServices.some(es => es.name === s.name));
+      if (newServices.length > 0) {
+        saveServices([...existingServices, ...newServices]);
+        displayServices();
+      }
+    }
+
+    // Charger les services au chargement de la page
+    window.addEventListener('load', function() {
+      displayServices();
+      loadServicesFromURL();
+    });
+
+    // Écouter les changements d'état de l'historique
+    window.addEventListener('popstate', function() {
+      loadServicesFromURL();
+      displayServices();
+    });
+  </script>
+</body>
+</html>

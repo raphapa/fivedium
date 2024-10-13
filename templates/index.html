@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fivedium - Connexion / Inscription</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #F8EDE7;
+            color: #8B4A39;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #FFF3EC;
+            border: 2px solid #C97A6A;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #B95A47;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #B95A47;
+        }
+
+        .form-container {
+            background-color: #F8EDE7;
+            padding: 15px;
+            border: 1px solid #C97A6A;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .tab-button {
+            background-color: #D88369;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            width: 50%;
+        }
+
+        .tab-button.active {
+            background-color: #C97A6A;
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            font-size: 14px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #C97A6A;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        button[type="submit"] {
+            background-color: #C97A6A;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #B95A47;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Fivedium</h1>
+            <p>Services créatifs pixelisés à partir de 5 crédits</p>
+        </header>
+
+        <div class="form-container">
+            <div class="form-header">
+                <button class="tab-button active" id="connexion-tab">Connexion</button>
+                <button class="tab-button" id="inscription-tab">Inscription</button>
+            </div>
+
+            <!-- Formulaire de Connexion -->
+            <div id="connexion-form" class="form active">
+                <form action='/login' method="POST">
+                    <label for="email">Email :</label>
+                    <input type="email" id="email" name="email" required>
+
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" name="password" required>
+
+                    <button type="submit">Se connecter</button>
+                </form>
+            </div>
+
+            <!-- Formulaire d'Inscription -->
+            <div id="inscription-form" class="form">
+                <form action='/register' method="POST">
+                    <label for="username">Nom d'utilisateur :</label>
+                    <input type="text" id="username" name="username" required>
+
+                    <label for="email-inscription">Email :</label>
+                    <input type="email" id="email-inscription" name="email-inscription" required>
+
+                    <label for="password-inscription">Mot de passe :</label>
+                    <input type="password" id="password-inscription" name="password-inscription" required>
+
+                    <label for="confirm-password">Confirmer le mot de passe :</label>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+
+                    <button type="submit">S'inscrire</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des onglets
+        const connexionTab = document.getElementById('connexion-tab');
+        const inscriptionTab = document.getElementById('inscription-tab');
+        const connexionForm = document.getElementById('connexion-form');
+        const inscriptionForm = document.getElementById('inscription-form');
+
+        // Quand on clique sur le bouton "Connexion"
+        connexionTab.addEventListener('click', function () {
+            // Activer l'onglet "Connexion"
+            connexionTab.classList.add('active');
+            inscriptionTab.classList.remove('active');
+            // Afficher le formulaire de connexion
+            connexionForm.classList.add('active');
+            inscriptionForm.classList.remove('active');
+        });
+
+        // Quand on clique sur le bouton "Inscription"
+        inscriptionTab.addEventListener('click', function () {
+            // Activer l'onglet "Inscription"
+            inscriptionTab.classList.add('active');
+            connexionTab.classList.remove('active');
+            // Afficher le formulaire d'inscription
+            inscriptionForm.classList.add('active');
+            connexionForm.classList.remove('active');
+        });
+    </script>
+</body>
+
+</html>
